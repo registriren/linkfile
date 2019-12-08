@@ -11,7 +11,6 @@ import youtube_dl
 import os
 import logging
 
-
 config = 'config.json'
 with open(config, 'r', encoding='utf-8') as c:
     conf = json.load(c)
@@ -22,12 +21,13 @@ logger = logging.getLogger(__name__)
 
 bot = BotHandler(token)
 
+
 def main():
     marker = None
-    chat_id = bot.get_chat_id() # Получаем chat_id последнего активного диалога с ботом
-    bot.send_message("Отправьте боту ссылку для скачивания", chat_id)
-    #video = ['mp4', 'avi', 'mkv', 'wmv', 'mov', 'm4v', 'h264', 'mpg', 'vob', 'flv']
-    #image = ['jpg', 'png', 'bmp', 'jpeg', 'tiff', 'psd', 'gif']
+    # chat_id = bot.get_chat_id() # Получаем chat_id последнего активного диалога с ботом
+    # bot.send_message("Отправьте боту ссылку для скачивания", chat_id)
+    # video = ['mp4', 'avi', 'mkv', 'wmv', 'mov', 'm4v', 'h264', 'mpg', 'vob', 'flv']
+    # image = ['jpg', 'png', 'bmp', 'jpeg', 'tiff', 'psd', 'gif']
     while True:
         update = bot.get_updates(
             marker)  # получаем внутреннее представление сообщения (контента) отправленного боту (сформированного ботом)
@@ -44,29 +44,31 @@ def main():
                 mid = bot.get_message_id(upd)
                 ydl_opts = {
                     'format': 'best',
-                    'download_archive': 'downloaded_videos.txt',
                     'outtmpl': 'video.%(ext)s',
                     'logger': logging.getLogger(__name__)
                 }
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                    #dat = ydl.download([text])
+                    # dat = ydl.download([text])
                     dat = ydl.extract_info(text, download=True)
-                    #url_vid = dat['url']
-                #protocol = dat['protocol']
-                #format = dat['format']
+                    # url_vid = dat['url']
+                # protocol = dat['protocol']
+                # format = dat['format']
                 title = dat['title']
                 ext = dat['ext']
-                #bot.send_message('format - {}\nProtocol - {}\nTitle - {}\nExt - {}'.format(format, protocol, title, ext), chat_id, dislinkprev=True)
+                # bot.send_message('format - {}\nProtocol - {}\nTitle - {}\nExt - {}'.format(format, protocol, title,
+                # ext), chat_id, dislinkprev=True)
                 bot.delete_message(mid)
                 upd = bot.send_message('Загружаю видео...', chat_id)
                 mid = bot.get_message_id(upd)
                 bot.send_video('video.{}'.format(ext), chat_id, text=title)
                 bot.delete_message(mid)
                 os.remove('video.{}'.format(ext))
+                logger.info('{} download {}'.format(chat_id, text))
 
-            except Exception:
+            except Exception as e:
                 bot.delete_message(mid)
                 bot.send_message('Ошибка скачивания, возможно ссылка с данного сервиса не поддерживается', chat_id)
+                logger.error('{}'.format(e))
 
 
 if __name__ == '__main__':
