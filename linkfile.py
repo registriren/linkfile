@@ -4,9 +4,7 @@
 
 from botapitamtam import BotHandler
 import json
-import requests
-import time
-import pprint
+import shutil
 import youtube_dl
 import os
 import logging
@@ -28,6 +26,10 @@ def main():
     # bot.send_message("Отправьте боту ссылку для скачивания", chat_id)
     # video = ['mp4', 'avi', 'mkv', 'wmv', 'mov', 'm4v', 'h264', 'mpg', 'vob', 'flv']
     # image = ['jpg', 'png', 'bmp', 'jpeg', 'tiff', 'psd', 'gif']
+    try:
+        shutil.rmtree(os.getcwd() + '/video')
+    except:
+        logger.error('Каталог для удаления не найден')
     while True:
         update = bot.get_updates(
             marker)  # получаем внутреннее представление сообщения (контента) отправленного боту (сформированного ботом)
@@ -60,9 +62,12 @@ def main():
                 bot.delete_message(mid)
                 upd = bot.send_message('Загружаю видео...', chat_id)
                 mid = bot.get_message_id(upd)
-                bot.send_video('video.{}'.format(ext), chat_id, text=title)
+                bot.send_video(os.getcwd() + '/video/video.{}'.format(ext), chat_id, text=title)
                 bot.delete_message(mid)
-                os.remove('video.{}'.format(ext))
+                try:
+                    shutil.rmtree(os.getcwd() + '/video')
+                except:
+                    logger.error('Каталог для удаления не найден')
                 logger.info('{} download {}'.format(chat_id, text))
 
             except Exception as e:
