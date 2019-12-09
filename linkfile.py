@@ -27,9 +27,9 @@ def main():
     # video = ['mp4', 'avi', 'mkv', 'wmv', 'mov', 'm4v', 'h264', 'mpg', 'vob', 'flv']
     # image = ['jpg', 'png', 'bmp', 'jpeg', 'tiff', 'psd', 'gif']
     try:
-        shutil.rmtree(os.getcwd() + '/video')
+        shutil.rmtree(os.getcwd() + "/video")
     except:
-        logger.error('Каталог для удаления не найден')
+        logger.error('Файл для удаления не найден')
     while True:
         update = bot.get_updates(
             marker)  # получаем внутреннее представление сообщения (контента) отправленного боту (сформированного ботом)
@@ -46,7 +46,7 @@ def main():
                 mid = bot.get_message_id(upd)
                 ydl_opts = {
                     'format': 'best',
-                    'outtmpl': 'video.%(ext)s',
+                    'outtmpl': os.getcwd() + '/video/video.%(ext)s',
                     'logger': logging.getLogger(__name__)
                 }
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -65,15 +65,16 @@ def main():
                 bot.send_video(os.getcwd() + '/video/video.{}'.format(ext), chat_id, text=title)
                 bot.delete_message(mid)
                 try:
-                    shutil.rmtree(os.getcwd() + '/video')
+                    shutil.rmtree(os.getcwd() + "/video")
                 except:
-                    logger.error('Каталог для удаления не найден')
+                    logger.error('Файл для удаления не найден')
                 logger.info('{} download {}'.format(chat_id, text))
 
             except Exception as e:
                 bot.delete_message(mid)
                 bot.send_message('Ошибка скачивания, возможно ссылка с данного сервиса не поддерживается', chat_id)
                 logger.error('{}'.format(e))
+
 
 
 if __name__ == '__main__':
