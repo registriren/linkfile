@@ -74,6 +74,10 @@ def main():
                 bot.delete_message(mid)
                 bot.send_message('Ошибка скачивания, возможно ссылка с данного сервиса не поддерживается', chat_id)
                 logger.error('{}'.format(e))
+                try:
+                    shutil.rmtree(os.getcwd() + "/video")
+                except:
+                    logger.error('Файл для удаления не найден')
 
 
 
