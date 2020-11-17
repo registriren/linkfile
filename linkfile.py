@@ -21,7 +21,6 @@ bot = BotHandler(token)
 
 
 def main():
-    marker = None
     # chat_id = bot.get_chat_id() # Получаем chat_id последнего активного диалога с ботом
     # bot.send_message("Отправьте боту ссылку для скачивания", chat_id)
     # video = ['mp4', 'avi', 'mkv', 'wmv', 'mov', 'm4v', 'h264', 'mpg', 'vob', 'flv']
@@ -31,18 +30,18 @@ def main():
     except:
         logger.error('Файл для удаления не найден')
     while True:
-        update = bot.get_updates(
-            marker)  # получаем внутреннее представление сообщения (контента) отправленного боту (сформированного ботом)
+        update = bot.get_updates()  # получаем внутреннее представление сообщения (контента) отправленного боту (сформированного ботом)
         # тут можно вставить любые действия которые должны выполняться во время ожидания события
-        if update == None:  # проверка на пустое событие, если пусто - возврат к началу цикла
-            continue
-        marker = bot.get_marker(update)
-        updates = update['updates']
-        for last_update in list(updates):  # формируем цикл на случай если updates вернул список из нескольких событий
-            text = bot.get_text(last_update)
-            chat_id = bot.get_chat_id(last_update)
+        if update:
+            chat_id = bot.get_chat_id(update)
+            att_type = bot.get_attach_type(update)
+            if att_type == 'share':
+                text = bot.get_url(update)
+            else:
+                text = bot.get_text(update)
+            print(text)
             try:
-                upd = bot.send_message('Обрабатываю контент...', chat_id)
+                upd = bot.send_message('Обрабатываю контент, ждите...', chat_id)
                 mid = bot.get_message_id(upd)
                 ydl_opts = {
                     'format': 'best',
@@ -78,7 +77,6 @@ def main():
                     shutil.rmtree(os.getcwd() + "/video")
                 except:
                     logger.error('Файл для удаления не найден')
-
 
 
 if __name__ == '__main__':
