@@ -39,7 +39,6 @@ def main():
                 text = bot.get_url(update)
             else:
                 text = bot.get_text(update)
-            print(text)
             try:
                 upd = bot.send_message('Обрабатываю контент, ждите...', chat_id)
                 mid = bot.get_message_id(upd)
